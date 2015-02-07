@@ -5,6 +5,7 @@ import rlp
 import utils
 import copy
 
+AMLOG_COUNTS = {'TOUCH_BRANCH_NODE': 0}
 
 bin_to_nibbles_cache = {}
 
@@ -329,6 +330,8 @@ class Trie(object):
 
         if node_type == NODE_TYPE_BRANCH:
             # already reach the expected node
+            AMLOG_COUNTS['TOUCH_BRANCH_NODE'] += 1
+            print "AMLOG: node touched", AMLOG_COUNTS['TOUCH_BRANCH_NODE']
             if not key:
                 return node[-1]
             sub_node = self._decode_to_node(node[key[0]])
@@ -389,6 +392,10 @@ class Trie(object):
         node_type = self._get_node_type(node)
         curr_key = without_terminator(unpack_to_nibbles(node[0]))
         is_inner = node_type == NODE_TYPE_EXTENSION
+
+        if not hasattr(self, 'UPDATE_KV_NODE'): self.UPDATE_KV_NODE = 0
+        print 'AMLOG: update_kv_node', self.UPDATE_KV_NODE
+        self.UPDATE_KV_NODE += 1
 
         # find longest common prefix
         prefix_length = 0
